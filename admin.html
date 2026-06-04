@@ -177,7 +177,7 @@ h1,h2,h3{font-family:'Newsreader',Georgia,serif;font-weight:600;}
             <button class="btn btn-green btn-sm" onclick="fotoNieuw()">+ Foto toevoegen</button>
           </div>
         </div>
-        <p style="color:var(--ink-soft);font-size:.92rem;margin-bottom:16px;">Voeg een URL van een afbeelding in. De foto moet publiek toegankelijk zijn (bijv. geüpload via Imgur, Google Drive of een andere hostingdienst).</p>
+        <p style="color:var(--ink-soft);font-size:.92rem;margin-bottom:16px;">Voeg een Google Photos gedeeld album toe. Maak een album aan in Google Photos, klik op &ldquo;Album delen&rdquo; en plak de link hieronder.</p>
         <div class="item-list" id="fotosList"></div>
       </div>
     </div>
@@ -250,9 +250,9 @@ h1,h2,h3{font-family:'Newsreader',Georgia,serif;font-weight:600;}
 <!-- FOTO FORMULIER MODAL -->
 <div class="modal-bg" id="fotoModal">
   <div class="modal">
-    <h2>Foto toevoegen</h2>
-    <div class="field"><label>URL van de afbeelding</label><input type="url" id="fotoUrl" placeholder="https://..."></div>
-    <div class="field"><label>Omschrijving (optioneel)</label><input type="text" id="fotoAlt" placeholder="Zomerfeest 2024"></div>
+    <h2>Album toevoegen</h2>
+    <div class="field"><label>Naam van het album</label><input type="text" id="fotoNaam" placeholder="Zomerfeest 3 juli 2025"></div>
+    <div class="field"><label>Google Photos album-URL</label><input type="url" id="fotoUrl" placeholder="https://photos.google.com/share/..."></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="sluitModal('fotoModal')">Annuleren</button>
       <button class="btn btn-green" onclick="fotoOpslaan()">Toevoegen</button>
@@ -538,37 +538,42 @@ function maandVerwijder(mi) {
   opslaanEnToon('jaarplanning', jaarplanning, 'data/jaarplanning.json', 'jaarplanning-status');
 }
 
-/* === FOTO'S === */
+/* === FOTO'S (albums) === */
 function renderFotos() {
   const lijst = document.getElementById('fotosList');
-  if (!fotos.length) { lijst.innerHTML = '<p style="color:var(--ink-soft);font-style:italic;">Nog geen foto\'s toegevoegd.</p>'; return; }
+  if (!fotos.length) { lijst.innerHTML = '<p style="color:var(--ink-soft);font-style:italic;">Nog geen albums toegevoegd.</p>'; return; }
   lijst.innerHTML = fotos.map((f, i) =>
     `<div class="item-row">
-      <img src="${f.src}" alt="${f.alt||''}" style="width:72px;height:52px;object-fit:cover;border-radius:8px;flex:none;">
-      <div class="item-info"><strong>${f.alt || '(geen omschrijving)'}</strong><span style="word-break:break-all;font-size:.82rem">${f.src}</span></div>
-      <div class="item-actions"><button class="btn btn-danger btn-sm" onclick="fotoVerwijder(${i})">Verwijder</button></div>
+      <div class="item-info">
+        <strong>${f.naam}</strong>
+        <span style="word-break:break-all;font-size:.82rem;color:var(--ink-soft)">${f.url}</span>
+      </div>
+      <div class="item-actions">
+        <a class="btn btn-ghost btn-sm" href="${f.url}" target="_blank" rel="noopener">Bekijk</a>
+        <button class="btn btn-danger btn-sm" onclick="fotoVerwijder(${i})">Verwijder</button>
+      </div>
     </div>`
   ).join('');
 }
 
 function fotoNieuw() {
+  document.getElementById('fotoNaam').value = '';
   document.getElementById('fotoUrl').value = '';
-  document.getElementById('fotoAlt').value = '';
   document.getElementById('fotoModal').classList.add('open');
 }
 
 function fotoOpslaan() {
-  const src = document.getElementById('fotoUrl').value.trim();
-  const alt = document.getElementById('fotoAlt').value.trim();
-  if (!src) return;
-  fotos.push({ src, alt });
+  const naam = document.getElementById('fotoNaam').value.trim();
+  const url = document.getElementById('fotoUrl').value.trim();
+  if (!naam || !url) return;
+  fotos.push({ naam, url });
   sluitModal('fotoModal');
   renderFotos();
   opslaanEnToon("foto's", fotos, 'data/fotos.json', 'fotos-status');
 }
 
 function fotoVerwijder(i) {
-  if (!confirm('Deze foto verwijderen?')) return;
+  if (!confirm('Dit album verwijderen?')) return;
   fotos.splice(i, 1);
   renderFotos();
   opslaanEnToon("foto's", fotos, 'data/fotos.json', 'fotos-status');
