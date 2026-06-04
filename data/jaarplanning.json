@@ -1,0 +1,51 @@
+[
+  {"maand": "Augustus", "jaar": "2025", "kleur": "gold", "note": "Iedere zaterdag tussen 9.00 en 12.00 uur spullen inleveren voor de pleinmarkt."},
+  {"maand": "September", "jaar": "2025", "kleur": "sage", "evenementen": [
+    {"datum": "13", "activiteit": "Pleinmarkt"},
+    {"datum": "13", "activiteit": "Kleedjesmarkt"},
+    {"datum": "24", "activiteit": "Noaberclub: spelletjes"},
+    {"datum": "27", "activiteit": "Kanaalspektakel"}
+  ]},
+  {"maand": "Oktober", "jaar": "2025", "kleur": "blush", "evenementen": [
+    {"datum": "3", "activiteit": "Pubquiz"},
+    {"datum": "17", "activiteit": "Halloween Disco"},
+    {"datum": "25", "activiteit": "Smokkeltocht"},
+    {"datum": "29", "activiteit": "Noaberclub: Celebrationduo"}
+  ]},
+  {"maand": "November", "jaar": "2025", "kleur": "terra", "evenementen": [
+    {"datum": "14", "activiteit": "Vrijwilligersavond"},
+    {"datum": "26", "activiteit": "Noaberclub: Sinterklaas"}
+  ]},
+  {"maand": "December", "jaar": "2025", "kleur": "sage", "evenementen": [
+    {"datum": "11", "activiteit": "Kerstworkshop"},
+    {"datum": "17", "activiteit": "Noaberclub: evergreen pop/pubquiz"},
+    {"datum": "31", "activiteit": "Carbid schieten"}
+  ]},
+  {"maand": "Januari", "jaar": "2026", "kleur": "blush", "evenementen": [
+    {"datum": "2", "activiteit": "Nieuwjaarsborrel"},
+    {"datum": "23", "activiteit": "Filmavond"},
+    {"datum": "28", "activiteit": "Noaberclub: fysiotherapeut"}
+  ]},
+  {"maand": "Februari", "jaar": "2026", "kleur": "gold", "evenementen": [
+    {"datum": "6", "activiteit": "Carnavalsdisco"},
+    {"datum": "26", "activiteit": "Noaberclub: boswachter"}
+  ]},
+  {"maand": "Maart", "jaar": "2026", "kleur": "sage", "evenementen": [
+    {"datum": "19", "activiteit": "Voorjaarsworkshop"},
+    {"datum": "21", "activiteit": "Nationale opschoondag"},
+    {"datum": "25", "activiteit": "Noaberclub: Zwier de Weerd"},
+    {"datum": "27", "activiteit": "Muziekquiz"}
+  ]},
+  {"maand": "April", "jaar": "2026", "kleur": "terra", "evenementen": [
+    {"datum": "29", "activiteit": "Noaberclub: Buurtzorg"}
+  ]},
+  {"maand": "Mei", "jaar": "2026", "kleur": "blush", "evenementen": [
+    {"datum": "9", "activiteit": "Fietsrit"},
+    {"datum": "25", "activiteit": "Pinkster-rit"},
+    {"datum": "27", "activiteit": "Noaberclub: uitje"}
+  ]},
+  {"maand": "Juni", "jaar": "2026", "kleur": "sage", "note": "Deze hele maand gebruiken we om het zomerfeest fantastisch te krijgen!"},
+  {"maand": "Juli", "jaar": "2026", "kleur": "gold", "evenementen": [
+    {"datum": "3+4", "activiteit": "Zomerfeest"}
+  ]}
+]

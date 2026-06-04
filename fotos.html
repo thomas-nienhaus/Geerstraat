@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foto's — Buurtraad Geerstraat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:1000; place-items:center; }
+  .lightbox.open { display:grid; }
+  .lightbox img { max-width:90vw; max-height:90vh; border-radius:12px; box-shadow:0 24px 60px rgba(0,0,0,.5); }
+  .lightbox-close { position:absolute; top:20px; right:24px; color:#fff; font-size:2rem; cursor:pointer; line-height:1; background:none; border:none; }
+</style>
+</head>
+<body>
+
+<div id="header-container"></div>
+
+<main>
+  <section class="page-hero">
+    <div class="wrap">
+      <span class="eyebrow">Herinneringen</span>
+      <h1>Foto's</h1>
+      <p>Een kijkje in de activiteiten en sfeer van de Geerstraat.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="foto-grid" id="fotoGrid">
+        <p style="color:var(--ink-soft);font-style:italic;">Foto's laden&hellip;</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="lightbox" id="lightbox" onclick="sluitLightbox()">
+  <button class="lightbox-close" aria-label="Sluiten">&times;</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<div id="footer-container"></div>
+<script src="assets/common.js"></script>
+<script>
+fetch('data/fotos.json').then(r => r.json()).then(fotos => {
+  const grid = document.getElementById('fotoGrid');
+  if (!fotos.length) {
+    grid.innerHTML = '<p class="foto-leeg">Er zijn nog geen foto\'s toegevoegd. Voeg foto\'s toe via de admin-pagina.</p>';
+    return;
+  }
+  grid.innerHTML = fotos.map((f, i) =>
+    `<div class="foto-item" onclick="openLightbox('${f.src}','${f.alt||''}')">
+      <img src="${f.src}" alt="${f.alt || ''}" loading="lazy">
+    </div>`
+  ).join('');
+}).catch(() => {
+  document.getElementById('fotoGrid').innerHTML = '<p class="foto-leeg">Foto\'s tijdelijk niet beschikbaar.</p>';
+});
+
+function openLightbox(src, alt) {
+  const lb = document.getElementById('lightbox');
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightboxImg').alt = alt;
+  lb.classList.add('open');
+}
+function sluitLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') sluitLightbox(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Buurtraad Geerstraat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,600&family=Hanken+Grotesque:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:#f7f1e6; --ink:#243321; --ink-soft:#4c5a44;
+  --green:#2f5d3a; --green-deep:#234630; --leaf:#7ba349; --leaf-soft:#e7eee0;
+  --terra:#a9683b; --blush:#f3ddd9; --r:14px;
+  --shadow:0 1px 2px rgba(53,42,24,.05),0 12px 30px -16px rgba(53,42,24,.3);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hanken Grotesque',system-ui,sans-serif;background:#f0ede6;color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
+h1,h2,h3{font-family:'Newsreader',Georgia,serif;font-weight:600;}
+
+/* Login scherm */
+.login-wrap{min-height:100vh;display:grid;place-items:center;padding:24px;}
+.login-card{background:#fff;border-radius:24px;padding:40px;box-shadow:var(--shadow);width:100%;max-width:400px;}
+.login-card .logo{width:64px;height:64px;border-radius:16px;overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow);}
+.login-card .logo img{width:100%;height:100%;object-fit:cover;object-position:top;}
+.login-card h1{font-size:1.7rem;color:var(--green-deep);margin-bottom:6px;}
+.login-card p{color:var(--ink-soft);font-size:.95rem;margin-bottom:28px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-weight:600;font-size:.85rem;color:var(--ink-soft);margin-bottom:6px;letter-spacing:.04em;}
+.field input,.field textarea,.field select{width:100%;padding:11px 14px;border:1.5px solid #ddd5c6;border-radius:10px;font-size:.97rem;font-family:inherit;background:#fafaf8;transition:border-color .15s;}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--green);}
+.field textarea{resize:vertical;min-height:80px;}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;padding:11px 22px;border-radius:999px;font-size:.97rem;cursor:pointer;border:none;transition:transform .15s,background .15s;}
+.btn:hover{transform:translateY(-1px);}
+.btn-green{background:var(--green);color:#fff;}
+.btn-green:hover{background:var(--green-deep);}
+.btn-ghost{background:var(--leaf-soft);color:var(--green-deep);}
+.btn-danger{background:#fee2e2;color:#b91c1c;}
+.btn-sm{padding:7px 14px;font-size:.87rem;}
+.error{color:#b91c1c;font-size:.9rem;margin-top:8px;display:none;}
+
+/* Admin shell */
+.admin-shell{display:none;flex-direction:column;min-height:100vh;}
+.admin-header{background:var(--green-deep);color:#fff;padding:14px 0;}
+.admin-header .inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px;}
+.admin-header .logo{width:40px;height:40px;border-radius:10px;overflow:hidden;flex:none;}
+.admin-header .logo img{width:100%;height:100%;object-fit:cover;object-position:top;}
+.admin-header h1{font-family:'Hanken Grotesque',sans-serif;font-size:1rem;font-weight:700;flex:1;}
+.admin-header .uitloggen{background:rgba(255,255,255,.15);color:#fff;padding:8px 16px;border-radius:999px;font-size:.87rem;font-weight:600;border:none;cursor:pointer;}
+.admin-header .uitloggen:hover{background:rgba(255,255,255,.25);}
+
+.admin-body{max-width:1100px;margin:0 auto;padding:32px 24px;flex:1;}
+
+/* Tabs */
+.tabs{display:flex;gap:8px;margin-bottom:28px;border-bottom:2px solid #ddd5c6;padding-bottom:0;}
+.tab{padding:10px 20px;border-radius:10px 10px 0 0;font-weight:600;font-size:.95rem;cursor:pointer;border:none;background:transparent;color:var(--ink-soft);margin-bottom:-2px;border-bottom:2px solid transparent;transition:color .15s;}
+.tab.actief{color:var(--green-deep);border-bottom-color:var(--green);}
+.tab:hover{color:var(--green-deep);}
+.tab-panel{display:none;}
+.tab-panel.actief{display:block;}
+
+/* Kaarten */
+.card{background:#fff;border-radius:var(--r);padding:24px;box-shadow:var(--shadow);margin-bottom:16px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.card-header h3{font-size:1.15rem;color:var(--green-deep);}
+.item-list{display:flex;flex-direction:column;gap:10px;}
+.item-row{background:#faf8f4;border:1.5px solid #ede8df;border-radius:10px;padding:14px 18px;display:flex;align-items:flex-start;gap:16px;}
+.item-info{flex:1;}
+.item-info strong{display:block;color:var(--ink);font-size:.98rem;}
+.item-info span{color:var(--ink-soft);font-size:.88rem;}
+.item-actions{display:flex;gap:8px;flex-shrink:0;}
+.badge-datum{display:inline-block;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--terra);font-weight:600;background:#fdf0e6;padding:3px 10px;border-radius:999px;margin-top:4px;}
+
+/* Formulier overlay */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;place-items:center;padding:20px;}
+.modal-bg.open{display:grid;}
+.modal{background:#fff;border-radius:20px;padding:32px;width:100%;max-width:520px;box-shadow:0 30px 60px rgba(0,0,0,.25);}
+.modal h2{font-size:1.4rem;color:var(--green-deep);margin-bottom:20px;}
+.modal-footer{display:flex;gap:12px;justify-content:flex-end;margin-top:20px;}
+
+/* Token instelling */
+.token-bar{background:#fffbf0;border:1.5px solid #ede0bb;border-radius:10px;padding:14px 18px;margin-bottom:24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.token-bar p{flex:1;font-size:.9rem;color:var(--ink-soft);}
+.token-status{font-size:.85rem;font-weight:600;}
+.token-status.ok{color:#166534;}
+.token-status.nee{color:#b91c1c;}
+
+/* Opslaan indicator */
+.opslaan-status{font-size:.88rem;font-weight:600;padding:6px 14px;border-radius:999px;display:none;}
+.opslaan-status.laden{background:#e0f0ff;color:#1e40af;display:inline-block;}
+.opslaan-status.ok{background:#dcfce7;color:#166534;display:inline-block;}
+.opslaan-status.fout{background:#fee2e2;color:#b91c1c;display:inline-block;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCHERM -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="logo"><img src="assets/logo.png" alt="logo"></div>
+    <h1>Admin inloggen</h1>
+    <p>Voer het beheerderswachtwoord in om de website te beheren.</p>
+    <form id="loginForm" onsubmit="login(event)">
+      <div class="field">
+        <label for="wachtwoord">Wachtwoord</label>
+        <input type="password" id="wachtwoord" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-green" style="width:100%;justify-content:center;">Inloggen</button>
+      <div class="error" id="loginFout">Onjuist wachtwoord. Probeer opnieuw.</div>
+    </form>
+  </div>
+</div>
+
+<!-- ADMIN SHELL -->
+<div class="admin-shell" id="adminShell">
+  <div class="admin-header">
+    <div class="inner">
+      <div class="logo"><img src="assets/logo.png" alt="logo"></div>
+      <h1>Buurtraad Geerstraat &mdash; Beheer</h1>
+      <button class="uitloggen" onclick="uitloggen()">Uitloggen</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- GitHub token balk -->
+    <div class="token-bar" id="tokenBalk">
+      <div>
+        <p><strong>GitHub token</strong> &mdash; Nodig om wijzigingen op te slaan op de website. Bewaard in uw browser.</p>
+        <span class="token-status nee" id="tokenStatus">Niet ingesteld</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="toonTokenModal()">Token instellen</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab actief" onclick="openTab('nieuws',this)">Nieuws</button>
+      <button class="tab" onclick="openTab('jaarplanning',this)">Jaarplanning</button>
+      <button class="tab" onclick="openTab('fotos',this)">Foto's</button>
+    </div>
+
+    <!-- NIEUWS TAB -->
+    <div class="tab-panel actief" id="tab-nieuws">
+      <div class="card">
+        <div class="card-header">
+          <h3>Nieuwsberichten</h3>
+          <div style="display:flex;gap:12px;align-items:center;">
+            <span class="opslaan-status" id="nieuws-status"></span>
+            <button class="btn btn-green btn-sm" onclick="nieuwsNieuw()">+ Nieuw bericht</button>
+          </div>
+        </div>
+        <div class="item-list" id="nieuwsList"></div>
+      </div>
+    </div>
+
+    <!-- JAARPLANNING TAB -->
+    <div class="tab-panel" id="tab-jaarplanning">
+      <div class="card">
+        <div class="card-header">
+          <h3>Jaarplanning evenementen</h3>
+          <div style="display:flex;gap:12px;align-items:center;">
+            <span class="opslaan-status" id="jaarplanning-status"></span>
+            <button class="btn btn-green btn-sm" onclick="evNieuw()">+ Evenement toevoegen</button>
+          </div>
+        </div>
+        <div class="item-list" id="evList"></div>
+      </div>
+    </div>
+
+    <!-- FOTOS TAB -->
+    <div class="tab-panel" id="tab-fotos">
+      <div class="card">
+        <div class="card-header">
+          <h3>Foto's</h3>
+          <div style="display:flex;gap:12px;align-items:center;">
+            <span class="opslaan-status" id="fotos-status"></span>
+            <button class="btn btn-green btn-sm" onclick="fotoNieuw()">+ Foto toevoegen</button>
+          </div>
+        </div>
+        <p style="color:var(--ink-soft);font-size:.92rem;margin-bottom:16px;">Voeg een URL van een afbeelding in. De foto moet publiek toegankelijk zijn (bijv. geüpload via Imgur, Google Drive of een andere hostingdienst).</p>
+        <div class="item-list" id="fotosList"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOKEN MODAL -->
+<div class="modal-bg" id="tokenModal">
+  <div class="modal">
+    <h2>GitHub token instellen</h2>
+    <p style="color:var(--ink-soft);font-size:.95rem;margin-bottom:20px;">Maak een <strong>fine-grained Personal Access Token</strong> aan op GitHub met schrijftoegang tot de repository <code>thomas-nienhaus/Geerstraat</code> (Contents: Read &amp; Write). Het token wordt alleen in uw browser opgeslagen.</p>
+    <div class="field">
+      <label>GitHub Personal Access Token</label>
+      <input type="password" id="tokenInput" placeholder="github_pat_...">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="sluitModal('tokenModal')">Annuleren</button>
+      <button class="btn btn-green" onclick="slaTokenOp()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- NIEUWS FORMULIER MODAL -->
+<div class="modal-bg" id="nieuwsModal">
+  <div class="modal">
+    <h2 id="nieuwsModalTitel">Nieuw bericht</h2>
+    <input type="hidden" id="nieuwsId">
+    <div class="field"><label>Titel</label><input type="text" id="nieuwsTitel" required></div>
+    <div class="field"><label>Datum</label><input type="date" id="nieuwsDatum" required></div>
+    <div class="field"><label>Inhoud</label><textarea id="nieuwsInhoud" rows="4"></textarea></div>
+    <div class="field"><label>Afbeelding URL (optioneel)</label><input type="url" id="nieuwsAfbeelding" placeholder="https://..."></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="sluitModal('nieuwsModal')">Annuleren</button>
+      <button class="btn btn-green" onclick="nieuwsOpslaan()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- EVENEMENT FORMULIER MODAL -->
+<div class="modal-bg" id="evModal">
+  <div class="modal">
+    <h2 id="evModalTitel">Evenement toevoegen</h2>
+    <input type="hidden" id="evIndex">
+    <div class="field"><label>Maand</label>
+      <select id="evMaand">
+        <option>Januari</option><option>Februari</option><option>Maart</option><option>April</option>
+        <option>Mei</option><option>Juni</option><option>Juli</option><option>Augustus</option>
+        <option>September</option><option>Oktober</option><option>November</option><option>December</option>
+      </select>
+    </div>
+    <div class="field"><label>Jaar</label><input type="text" id="evJaar" placeholder="2026"></div>
+    <div class="field"><label>Datum in de maand (bijv. 13 of 3+4)</label><input type="text" id="evDatum" placeholder="13"></div>
+    <div class="field"><label>Activiteit</label><input type="text" id="evActiviteit" placeholder="Pleinmarkt"></div>
+    <div class="field"><label>Kleur kaart</label>
+      <select id="evKleur">
+        <option value="sage">Groen (sage)</option>
+        <option value="blush">Roze (blush)</option>
+        <option value="gold">Goud</option>
+        <option value="terra">Terra</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="sluitModal('evModal')">Annuleren</button>
+      <button class="btn btn-green" onclick="evOpslaan()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOTO FORMULIER MODAL -->
+<div class="modal-bg" id="fotoModal">
+  <div class="modal">
+    <h2>Foto toevoegen</h2>
+    <div class="field"><label>URL van de afbeelding</label><input type="url" id="fotoUrl" placeholder="https://..."></div>
+    <div class="field"><label>Omschrijving (optioneel)</label><input type="text" id="fotoAlt" placeholder="Zomerfeest 2024"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="sluitModal('fotoModal')">Annuleren</button>
+      <button class="btn btn-green" onclick="fotoOpslaan()">Toevoegen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* === Configuratie === */
+const WACHTWOORD_HASH = '0cdc81dd68f4d8c076feaeeded047cf3b2cb7ea0f3364f03c84547d887c0c922'; // sha256("geerstraat")
+const GITHUB_OWNER = 'thomas-nienhaus';
+const GITHUB_REPO = 'Geerstraat';
+const GITHUB_BRANCH = 'main';
+
+/* === State === */
+let nieuws = [], jaarplanning = [], fotos = [];
+
+/* === Login === */
+async function login(e) {
+  e.preventDefault();
+  const pw = document.getElementById('wachtwoord').value;
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+  const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  if (hash === WACHTWOORD_HASH) {
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('adminShell').style.display = 'flex';
+    laadData();
+    controleerToken();
+  } else {
+    document.getElementById('loginFout').style.display = 'block';
+  }
+}
+
+function uitloggen() {
+  location.reload();
+}
+
+/* === Token === */
+function controleerToken() {
+  const token = localStorage.getItem('gs_ghtoken');
+  const el = document.getElementById('tokenStatus');
+  if (token) { el.textContent = 'Ingesteld ✓'; el.className = 'token-status ok'; }
+  else { el.textContent = 'Niet ingesteld'; el.className = 'token-status nee'; }
+}
+
+function toonTokenModal() {
+  const t = localStorage.getItem('gs_ghtoken') || '';
+  document.getElementById('tokenInput').value = t;
+  document.getElementById('tokenModal').classList.add('open');
+}
+
+function slaTokenOp() {
+  const val = document.getElementById('tokenInput').value.trim();
+  if (val) localStorage.setItem('gs_ghtoken', val);
+  else localStorage.removeItem('gs_ghtoken');
+  sluitModal('tokenModal');
+  controleerToken();
+}
+
+/* === Data laden === */
+async function laadData() {
+  [nieuws, jaarplanning, fotos] = await Promise.all([
+    fetch('data/nieuws.json').then(r => r.json()).catch(() => []),
+    fetch('data/jaarplanning.json').then(r => r.json()).catch(() => []),
+    fetch('data/fotos.json').then(r => r.json()).catch(() => []),
+  ]);
+  renderNieuws();
+  renderJaarplanning();
+  renderFotos();
+}
+
+/* === GitHub opslaan === */
+async function slaOpInGitHub(pad, inhoud, bericht) {
+  const token = localStorage.getItem('gs_ghtoken');
+  if (!token) { alert('Stel eerst een GitHub token in via de token-balk.'); return false; }
+  try {
+    // Haal huidige SHA op
+    const info = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${pad}?ref=${GITHUB_BRANCH}`, {
+      headers: { Authorization: `token ${token}` }
+    }).then(r => r.json());
+    const sha = info.sha;
+    const body = JSON.stringify({
+      message: bericht,
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(inhoud, null, 2)))),
+      sha,
+      branch: GITHUB_BRANCH,
+      committer: { name: 'Geerstraat Admin', email: 'geerstraatvaassen@gmail.com' }
+    });
+    const resp = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${pad}`, {
+      method: 'PUT',
+      headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+      body
+    });
+    return resp.ok;
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
+}
+
+async function opslaanEnToon(type, data, pad, statusId) {
+  const el = document.getElementById(statusId);
+  el.textContent = 'Opslaan…'; el.className = 'opslaan-status laden';
+  const ok = await slaOpInGitHub(pad, data, `Admin: ${type} bijgewerkt`);
+  el.textContent = ok ? 'Opgeslagen ✓' : 'Fout bij opslaan';
+  el.className = ok ? 'opslaan-status ok' : 'opslaan-status fout';
+  setTimeout(() => { el.style.display = 'none'; el.className = 'opslaan-status'; }, 4000);
+}
+
+/* === Tabs === */
+function openTab(naam, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('actief'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('actief'));
+  btn.classList.add('actief');
+  document.getElementById('tab-' + naam).classList.add('actief');
+}
+
+/* === Modals === */
+function sluitModal(id) { document.getElementById(id).classList.remove('open'); }
+
+/* === NIEUWS === */
+function renderNieuws() {
+  const lijst = document.getElementById('nieuwsList');
+  if (!nieuws.length) { lijst.innerHTML = '<p style="color:var(--ink-soft);font-style:italic;">Nog geen berichten.</p>'; return; }
+  const gesorteerd = [...nieuws].sort((a,b) => b.datum.localeCompare(a.datum));
+  lijst.innerHTML = gesorteerd.map(n => {
+    const ds = new Date(n.datum).toLocaleDateString('nl-NL',{day:'numeric',month:'long',year:'numeric'});
+    return `<div class="item-row">
+      <div class="item-info">
+        <strong>${n.titel}</strong>
+        <div class="badge-datum">${ds}</div>
+        <span>${n.inhoud.substring(0,120)}${n.inhoud.length>120?'…':''}</span>
+      </div>
+      <div class="item-actions">
+        <button class="btn btn-ghost btn-sm" onclick="nieuwsBewerk(${n.id})">Bewerken</button>
+        <button class="btn btn-danger btn-sm" onclick="nieuwsVerwijder(${n.id})">Verwijder</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function nieuwsNieuw() {
+  document.getElementById('nieuwsModalTitel').textContent = 'Nieuw bericht';
+  document.getElementById('nieuwsId').value = '';
+  document.getElementById('nieuwsTitel').value = '';
+  document.getElementById('nieuwsDatum').value = new Date().toISOString().split('T')[0];
+  document.getElementById('nieuwsInhoud').value = '';
+  document.getElementById('nieuwsAfbeelding').value = '';
+  document.getElementById('nieuwsModal').classList.add('open');
+}
+
+function nieuwsBewerk(id) {
+  const n = nieuws.find(x => x.id === id);
+  if (!n) return;
+  document.getElementById('nieuwsModalTitel').textContent = 'Bericht bewerken';
+  document.getElementById('nieuwsId').value = id;
+  document.getElementById('nieuwsTitel').value = n.titel;
+  document.getElementById('nieuwsDatum').value = n.datum;
+  document.getElementById('nieuwsInhoud').value = n.inhoud;
+  document.getElementById('nieuwsAfbeelding').value = n.afbeelding || '';
+  document.getElementById('nieuwsModal').classList.add('open');
+}
+
+function nieuwsOpslaan() {
+  const id = document.getElementById('nieuwsId').value;
+  const item = {
+    id: id ? parseInt(id) : Date.now(),
+    titel: document.getElementById('nieuwsTitel').value,
+    datum: document.getElementById('nieuwsDatum').value,
+    inhoud: document.getElementById('nieuwsInhoud').value,
+    afbeelding: document.getElementById('nieuwsAfbeelding').value,
+  };
+  if (id) {
+    const idx = nieuws.findIndex(x => x.id === parseInt(id));
+    if (idx !== -1) nieuws[idx] = item;
+  } else {
+    nieuws.unshift(item);
+  }
+  sluitModal('nieuwsModal');
+  renderNieuws();
+  opslaanEnToon('nieuws', nieuws, 'data/nieuws.json', 'nieuws-status');
+}
+
+function nieuwsVerwijder(id) {
+  if (!confirm('Dit bericht verwijderen?')) return;
+  nieuws = nieuws.filter(x => x.id !== id);
+  renderNieuws();
+  opslaanEnToon('nieuws', nieuws, 'data/nieuws.json', 'nieuws-status');
+}
+
+/* === JAARPLANNING === */
+function renderJaarplanning() {
+  const lijst = document.getElementById('evList');
+  if (!jaarplanning.length) { lijst.innerHTML = '<p style="color:var(--ink-soft);font-style:italic;">Nog geen evenementen.</p>'; return; }
+  lijst.innerHTML = jaarplanning.map((m, mi) => {
+    if (m.note) {
+      return `<div class="item-row">
+        <div class="item-info"><strong>${m.maand} ${m.jaar}</strong><span>${m.note}</span></div>
+        <div class="item-actions"><button class="btn btn-danger btn-sm" onclick="maandVerwijder(${mi})">Verwijder</button></div>
+      </div>`;
+    }
+    return (m.evenementen || []).map((ev, ei) =>
+      `<div class="item-row">
+        <div class="item-info">
+          <strong>${ev.activiteit}</strong>
+          <div class="badge-datum">${m.maand} ${m.jaar}</div>
+          <span>Dag: ${ev.datum}</span>
+        </div>
+        <div class="item-actions">
+          <button class="btn btn-ghost btn-sm" onclick="evBewerk(${mi},${ei})">Bewerken</button>
+          <button class="btn btn-danger btn-sm" onclick="evVerwijder(${mi},${ei})">Verwijder</button>
+        </div>
+      </div>`
+    ).join('');
+  }).join('');
+}
+
+function evNieuw() {
+  document.getElementById('evModalTitel').textContent = 'Evenement toevoegen';
+  document.getElementById('evIndex').value = '';
+  document.getElementById('evMaand').value = 'Januari';
+  document.getElementById('evJaar').value = new Date().getFullYear();
+  document.getElementById('evDatum').value = '';
+  document.getElementById('evActiviteit').value = '';
+  document.getElementById('evKleur').value = 'sage';
+  document.getElementById('evModal').classList.add('open');
+}
+
+function evBewerk(mi, ei) {
+  const m = jaarplanning[mi];
+  const ev = m.evenementen[ei];
+  document.getElementById('evModalTitel').textContent = 'Evenement bewerken';
+  document.getElementById('evIndex').value = `${mi},${ei}`;
+  document.getElementById('evMaand').value = m.maand;
+  document.getElementById('evJaar').value = m.jaar;
+  document.getElementById('evDatum').value = ev.datum;
+  document.getElementById('evActiviteit').value = ev.activiteit;
+  document.getElementById('evKleur').value = m.kleur || 'sage';
+  document.getElementById('evModal').classList.add('open');
+}
+
+function evOpslaan() {
+  const maand = document.getElementById('evMaand').value;
+  const jaar = document.getElementById('evJaar').value;
+  const datum = document.getElementById('evDatum').value;
+  const activiteit = document.getElementById('evActiviteit').value;
+  const kleur = document.getElementById('evKleur').value;
+  const idxVal = document.getElementById('evIndex').value;
+
+  if (idxVal) {
+    const [mi, ei] = idxVal.split(',').map(Number);
+    jaarplanning[mi].evenementen[ei] = { datum, activiteit };
+    jaarplanning[mi].kleur = kleur;
+  } else {
+    let maandObj = jaarplanning.find(m => m.maand === maand && m.jaar === jaar);
+    if (!maandObj) {
+      maandObj = { maand, jaar, kleur, evenementen: [] };
+      jaarplanning.push(maandObj);
+    }
+    if (!maandObj.evenementen) maandObj.evenementen = [];
+    maandObj.evenementen.push({ datum, activiteit });
+    maandObj.kleur = kleur;
+  }
+  sluitModal('evModal');
+  renderJaarplanning();
+  opslaanEnToon('jaarplanning', jaarplanning, 'data/jaarplanning.json', 'jaarplanning-status');
+}
+
+function evVerwijder(mi, ei) {
+  if (!confirm('Dit evenement verwijderen?')) return;
+  jaarplanning[mi].evenementen.splice(ei, 1);
+  if (!jaarplanning[mi].evenementen.length && !jaarplanning[mi].note) {
+    jaarplanning.splice(mi, 1);
+  }
+  renderJaarplanning();
+  opslaanEnToon('jaarplanning', jaarplanning, 'data/jaarplanning.json', 'jaarplanning-status');
+}
+
+function maandVerwijder(mi) {
+  if (!confirm('Deze maandnotitie verwijderen?')) return;
+  jaarplanning.splice(mi, 1);
+  renderJaarplanning();
+  opslaanEnToon('jaarplanning', jaarplanning, 'data/jaarplanning.json', 'jaarplanning-status');
+}
+
+/* === FOTO'S === */
+function renderFotos() {
+  const lijst = document.getElementById('fotosList');
+  if (!fotos.length) { lijst.innerHTML = '<p style="color:var(--ink-soft);font-style:italic;">Nog geen foto\'s toegevoegd.</p>'; return; }
+  lijst.innerHTML = fotos.map((f, i) =>
+    `<div class="item-row">
+      <img src="${f.src}" alt="${f.alt||''}" style="width:72px;height:52px;object-fit:cover;border-radius:8px;flex:none;">
+      <div class="item-info"><strong>${f.alt || '(geen omschrijving)'}</strong><span style="word-break:break-all;font-size:.82rem">${f.src}</span></div>
+      <div class="item-actions"><button class="btn btn-danger btn-sm" onclick="fotoVerwijder(${i})">Verwijder</button></div>
+    </div>`
+  ).join('');
+}
+
+function fotoNieuw() {
+  document.getElementById('fotoUrl').value = '';
+  document.getElementById('fotoAlt').value = '';
+  document.getElementById('fotoModal').classList.add('open');
+}
+
+function fotoOpslaan() {
+  const src = document.getElementById('fotoUrl').value.trim();
+  const alt = document.getElementById('fotoAlt').value.trim();
+  if (!src) return;
+  fotos.push({ src, alt });
+  sluitModal('fotoModal');
+  renderFotos();
+  opslaanEnToon("foto's", fotos, 'data/fotos.json', 'fotos-status');
+}
+
+function fotoVerwijder(i) {
+  if (!confirm('Deze foto verwijderen?')) return;
+  fotos.splice(i, 1);
+  renderFotos();
+  opslaanEnToon("foto's", fotos, 'data/fotos.json', 'fotos-status');
+}
+</script>
+</body>
+</html>
